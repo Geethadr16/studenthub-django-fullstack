@@ -104,47 +104,63 @@
         </a>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row g-3 mb-4">
 
-        <div class="col-md-4">
-            <div class="card stat-card shadow-sm h-100">
-                <div class="card-body p-4">
-                    <p class="stat-label mb-2">Total Students</p>
-                    <h2 class="stat-value mb-0">
-                        {{ stud|length }}
-                    </h2>
-                </div>
+<!-- Statistics Cards -->
+<div class="row g-3 mb-4">
+
+    <!-- Total Students -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card stat-card shadow-sm h-100">
+            <div class="card-body p-4">
+                <p class="stat-label mb-2">Total Students</p>
+                <h2 class="stat-value mb-0">
+                    {{ total_students }}
+                </h2>
             </div>
         </div>
-
-        <div class="col-md-4">
-            <div class="card stat-card shadow-sm h-100">
-                <div class="card-body p-4">
-                    <p class="stat-label mb-2">Records Displayed</p>
-                    <h2 class="stat-value mb-0"
-                        id="visibleStudents">
-                        {{ stud|length }}
-                    </h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card stat-card shadow-sm h-100">
-                <div class="card-body p-4">
-                    <p class="stat-label mb-2">System Status</p>
-                    <h2 class="fs-5 fw-bold text-success mb-0">
-                        ● Active
-                    </h2>
-                    <small class="text-muted">
-                        Dashboard available
-                    </small>
-                </div>
-            </div>
-        </div>
-
     </div>
+
+    <!-- Matching Students -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card stat-card shadow-sm h-100">
+            <div class="card-body p-4">
+                <p class="stat-label mb-2">Matching Students</p>
+                <h2 class="stat-value mb-0">
+                    {{ matching_students }}
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Records Displayed -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card stat-card shadow-sm h-100">
+            <div class="card-body p-4">
+                <p class="stat-label mb-2">Records Displayed</p>
+                <h2 class="stat-value mb-0" id="visibleStudents">
+                    {{ stud|length }}
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card stat-card shadow-sm h-100">
+            <div class="card-body p-4">
+                <p class="stat-label mb-2">System Status</p>
+                <h2 class="fs-5 fw-bold text-success mb-0">
+                    ● Active
+                </h2>
+                <small class="text-muted">
+                    Dashboard available
+                </small>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 
     <!-- Student Records -->
     <div class="card table-card shadow-sm">
@@ -163,11 +179,80 @@
                     </p>
                 </div>
 
-                <input type="search"
-                       id="studentSearch"
-                       class="form-control search-box"
-                       placeholder="Search students..."
-                       aria-label="Search students">
+                
+<div class="d-flex flex-wrap gap-2 align-items-center">
+
+    <!-- Sorting Dropdown -->
+    <form method="GET">
+        <input type="hidden" name="q" value="{{ search_query }}">
+
+        <select name="sort"
+            class="form-select"
+                aria-label="Sort students"
+                onchange="this.form.submit()">
+
+            <option value="name"
+                {% if current_sort == 'name' %}selected{% endif %}>
+                Name (A–Z)
+            </option>
+
+            <option value="name_desc"
+                {% if current_sort == 'name_desc' %}selected{% endif %}>
+                Name (Z–A)
+            </option>
+
+            <option value="age_asc"
+                {% if current_sort == 'age_asc' %}selected{% endif %}>
+                Age (Youngest First)
+            </option>
+
+            <option value="age_desc"
+                {% if current_sort == 'age_desc' %}selected{% endif %}>
+                Age (Oldest First)
+            </option>
+
+            <option value="dob_newest"
+                {% if current_sort == 'dob_newest' %}selected{% endif %}>
+                DOB (Newest First)
+            </option>
+
+            <option value="dob_oldest"
+                {% if current_sort == 'dob_oldest' %}selected{% endif %}>
+                DOB (Oldest First)
+            </option>
+
+        </select>
+    </form>
+
+    
+<!-- Database-wide Student Search -->
+<form method="GET" action="" class="d-flex gap-2 align-items-center">
+    <input type="hidden"
+           name="sort"
+           value="{{ current_sort }}">
+
+    <input type="search"
+           name="q"
+           class="form-control search-box"
+           placeholder="Search name, email or place..."
+           aria-label="Search students"
+           value="{{ search_query }}">
+
+    <button type="submit" class="btn btn-primary">
+        Search
+    </button>
+
+    {% if search_query %}
+    <a href="?sort={{ current_sort }}"
+       class="btn btn-outline-secondary">
+        Clear
+    </a>
+    {% endif %}
+</form>
+
+
+</div>
+
             </div>
 
             <div class="table-responsive">
@@ -234,11 +319,61 @@
                 </table>
             </div>
 
+            
+                </table>
+            </div>
+
+            
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<nav aria-label="Student pagination" class="mt-4">
+    <ul class="pagination justify-content-center flex-wrap">
+
+        <!-- Previous -->
+        <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+            {% if page_obj.has_previous %}
+            <a class="page-link"
+               href="?page={{ page_obj.previous_page_number }}&amp;sort={{ current_sort }}&amp;q={{ search_query|urlencode }}">
+                Previous
+            </a>
+            {% else %}
+            <span class="page-link">Previous</span>
+            {% endif %}
+        </li>
+
+        <!-- Page Numbers -->
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link"
+               href="?page={{ num }}&amp;sort={{ current_sort }}&amp;q={{ search_query|urlencode }}">
+                {{ num }}
+            </a>
+        </li>
+        {% endfor %}
+
+        <!-- Next -->
+        <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+            {% if page_obj.has_next %}
+            <a class="page-link"
+               href="?page={{ page_obj.next_page_number }}&amp;sort={{ current_sort }}&amp;q={{ search_query|urlencode }}">
+                Next
+            </a>
+            {% else %}
+            <span class="page-link">Next</span>
+            {% endif %}
+        </li>
+
+    </ul>
+</nav>
+{% endif %}
+
+
             <p id="noSearchResults"
                class="text-center text-muted py-3 d-none"
                role="status">
                 No matching students found.
             </p>
+
 
         </div>
     </div>
@@ -247,39 +382,4 @@
 
 {% endblock %}
 
-{% block extra_js %}
-<script>
-    const searchInput = document.getElementById("studentSearch");
-    const rows = document.querySelectorAll(
-        "#studentTable tbody tr.student-row"
-    );
-    const noResults = document.getElementById("noSearchResults");
-    const visibleStudents = document.getElementById("visibleStudents");
 
-    function filterStudents() {
-        const query = searchInput.value.toLowerCase().trim();
-        let visibleCount = 0;
-
-        rows.forEach(function (row) {
-            const matches = row.textContent
-                .toLowerCase()
-                .includes(query);
-
-            row.style.display = matches ? "" : "none";
-
-            if (matches) {
-                visibleCount++;
-            }
-        });
-
-        visibleStudents.textContent = visibleCount;
-
-        noResults.classList.toggle(
-            "d-none",
-            visibleCount > 0 || query === "" || rows.length === 0
-        );
-    }
-
-    searchInput.addEventListener("input", filterStudents);
-</script>
-{% endblock %}

@@ -1,6 +1,5 @@
 
 from datetime import date
-
 from django.test import TestCase
 from myapp.models import Student
 
@@ -172,3 +171,68 @@ class StudentViewTest(TestCase):
         self.assertFalse(
             Student.objects.filter(id=student.id).exists()
         )
+
+class StudentSearchTests(TestCase):
+
+    def test_search_by_name(self):
+        Student.objects.create(
+            name="Aarav Sharma",
+            age=22,
+            dob=date(2004, 3, 15),
+            email="aarav@example.com",
+            place="Bengaluru"
+        )
+
+        response = self.client.get("/", {"q": "Aarav"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Aarav Sharma")
+        self.assertEqual(response.context["matching_students"], 1)
+    
+    def test_sort_students_by_name_descending(self):
+        Student.objects.create(
+            name="Aarav",
+            age=22,
+            dob=date(2004, 3, 15),
+            email="aarav@example.com",
+            place="Bengaluru"
+        )
+
+        Student.objects.create(
+            name="Zoya",
+            age=23,
+            dob=date(2003, 5, 20),
+            email="zoya@example.com",
+            place="Mysuru"
+        )
+
+        response = self.client.get("/", {"sort": "name_desc"})
+
+        students = list(response.context["stud"])
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(students[0].name, "Zoya")
+        self.assertEqual(students[1].name, "Aarav")
+
+    
+    def test_student_pagination(self):
+        for i in range(1, 7):
+            Student.objects.create(
+                name=f"Student {i}",
+                age=20 + i,
+                dob=date(2004, 1, 1),
+                email=f"student{i}@example.com",
+                place="Bengaluru"
+            )
+
+        response = self.client.get("/", {"page": 1})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["stud"]), 5)
+        self.assertEqual(response.context["total_students"], 6)
+
+        response = self.client.get("/", {"page": 2})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context["stud"]), 1)
+        self.assertEqual(response.context["page_obj"].number, 2)
