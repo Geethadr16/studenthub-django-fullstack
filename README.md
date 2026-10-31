@@ -25,6 +25,30 @@ The application includes automated testing using Django's testing framework and 
 - 📱 **Responsive Design:** Bootstrap-based interface with reusable Django templates.
 - 🧪 **Automated Testing:** Django unit tests covering models, CRUD operations, search, sorting, and pagination.
 
+
+## 📸 Application Screenshots
+
+### 🎓 Student Dashboard
+Student management dashboard featuring summary statistics, student records, sorting, and pagination.
+
+![Student Dashboard](screenshots/student-dashboard.png)
+
+### 📝 Add Student Form
+Form for creating student records with name, age, date of birth, email, and place.
+
+![Add Student Form](screenshots/add-student.png)
+
+### 🔍 Search and Sorting
+Student search functionality with filtered results and sorting options.
+
+![Search and Sorting](screenshots/search-sorting.png)
+
+### 🧪 Automated Testing
+Successfully executed all 11 automated Django tests.
+
+![Automated Tests](screenshots/automated-tests.png)
+
+
 ## 🛠️ Tech Stack
 
 | Category | Technologies |
@@ -65,6 +89,11 @@ studenthub-django-fullstack/
 │   └── tests.py
 ├── templates/
 │   └── myapp/
+├── screenshots/
+│   ├── student-dashboard.png
+│   ├── add-student.png
+│   ├── search-sorting.png
+│   └── automated-tests.png
 ├── manage.py
 ├── requirements.txt
 └── README.md
